@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Fetch Sandbox</title>
+  <link rel="stylesheet" href="https://cdn.rawgit.com/sindresorhus/github-markdown-css/gh-pages/github-markdown.css">
+  <link rel="stylesheet" href="prism.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      height: 100vh;
+    }
+    .readme, .sandbox {
+      overflow-y: scroll;
+      overflow-x: hidden;
+      height: 100%;
+      width: 50%;
+      float:left;
+    }
+
+    .readme {
+      padding: 10px;
+    }
+
+    iframe {
+      border: none;
+    }
+
+    @media all and (max-width: 779px) {
+      .readme, .sandbox {
+        width: 100%;
+      }
+      .sandbox {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body id="preview">
+  <div class="readme">
+    <h1 id="what-the-fetch-">What the <code>fetch</code>?</h1>
+    <p><em>A <code>XHR</code> replacement for the modern web</em>.</p>
+    <hr>
+    <h2 id="howto-raw-xhr-">HowTo: Raw <code>XHR</code></h2>
+    <p>Doing <code>XHR</code> without <code>fetch</code> looks something like this:</p>
+    <pre><code class="lang-javascript">
+    // Simple XHR request in pure JavaScript
+    var xhr = new XMLHttpRequest();
+    xhr.open(&#39;GET&#39;, &#39;http://my.api.com/data&#39;, true);
+    xhr.onload = function(e) {
+      // Do something with the request here
+      // NOTE: Both success and error handling
+      // needs to happen here
+      // NOTE: Don&#39;t forget to parse the body!
+    }
+    xhr.send(&#39;&#39;);
+    </code></pre>
+    <p>Hopefully we can all agree this stinks</p>
+    <h2 id="enter-fetch-">Enter <code>fetch</code></h2>
+    <p>Using fetch we can simply the above code and make it far easier to work with</p>
+    <p><em>NOTE: We will use some ES6 just for fun</em></p>
+    <pre><code class="lang-javascript">
+    // Make the request (returns a `Promise`)
+    fetch(&#39;http://my.api.com/data&#39;)
+      // Convert the body to `JSON`. Headers
+      // are available at this state so you can
+      // handle the response here without parsing
+      // the body if you&#39;d like
+    .then(res =&gt; res.json)
+    .then(res =&gt; {
+      // Do stuff with `res`
+    });
+    </code></pre>
+    <h2 id="customizing-fetch-request">Customizing <code>fetch</code> request</h2>
+    <p>Similar to <code>$.ajax</code> and <code>$http</code>, <code>fetch</code> takes a config object that will allow a user to configure the headers, body, method and other properties of the request (A full list can be seen under the <code>init</code> label <a href="https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#Parameters">here</a>).</p>
+    <p>So if I wanted to send a different type of request or addition headers I could modify the request I sent before with a simple object:</p>
+    <pre><code class="lang-javascript">
+    var config = {
+      method: &#39;HEAD&#39;,
+      headers: {
+        &#39;Authorizationn&#39;: &#39;My Auth Key&#39;
+      }
+    }
+
+    fetch(&#39;http://my.api.com/data&#39;, config)
+    ...
+    </code></pre>
+    <h2 id="-fetch-response"><code>fetch</code> response</h2>
+    <p>The value passed to the <code>.then</code> of the returned promise is fully documented <a href="https://developer.mozilla.org/en-US/docs/Web/API/Response">here</a>. It contains all of the headers and status properties that you need in addition to a several options for parsing the body:</p>
+    <ul>
+    <li><code>arrayBuffer</code></li>
+    <li><code>blob</code></li>
+    <li><code>formdata</code></li>
+    <li><code>json</code></li>
+    <li><code>text</code></li>
+    </ul>
+    <p>For my purposes here I want to parse the body as <code>JSON</code> so I return <code>res.json()</code> and the parsed value is available to me in the next <code>.then</code> of the promise.</p>
+    <p><em>An example of the properties available in <code>response</code></em></p>
+    <p><img src="exampleFetch.png" alt="Example response properties">;</p>
+    <h2 id="using-fetch-">Using <code>fetch</code></h2>
+    <p>The browser support of <code>fetch</code> is still limited to Firefox and Chrome (<a href="http://caniuse.com/#feat=fetch">http://caniuse.com/#feat=fetch</a>). That said there is a polyfill available! Head on over to <a href="https://github.com/github/fetch">https://github.com/github/fetch</a> to check it out.</p>
+    <p>Detecting feature support is fairly straightforward. Simply check for the global <code>fetch</code> object and if it doesn&#39;t exist you either need to use <code>XHR</code> or bring in the polyfill.</p>
+    <p><em>An example of conditionally loading the fetch polyfill from RawGit CDN</em></p>
+    <pre><code class="lang-javascript">
+    if (!window.fetch) {
+      let script = document.createElement(&#39;script&#39;);
+      script.src = &#39;https://cdn.rawgit.com/github/fetch/master/fetch.js&#39;;
+      script.async = true;
+      document.head.appendChild(script);
+    }
+    </code></pre>
+    <script src='prism.js' data-default-language="javascript"></script>
+  </div>
+  <div class="sandbox">
+    <iframe src="sandbox.html" width="100%" height="100%"></iframe>
+  </div>
+</body>
+</html>

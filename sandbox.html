@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Fetch Sandbox</title>
+    <script>
+      if (!window.fetch) {
+        var script = document.createElement('script');
+        script.src = 'https://cdn.rawgit.com/github/fetch/master/fetch.js';
+        script.async = true;
+        document.head.appendChild(script);
+      }
+    </script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/sindresorhus/github-markdown-css/gh-pages/github-markdown.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css">
+    <link rel="stylesheet" href="prism.css">
+    <style>
+      * {
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+      }
+      body {
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sandbox</h1>
+    <p>
+      <label for="url_input">URL:</label>
+      <input id='url' type="text" name="url_input" value='http://jsonplaceholder.typicode.com/posts'>
+      <button type="button" name="button" id='fetch'>fetch</button>
+    </p>
+    <p>
+      <label for="response_type">Parse response as:</label>
+      <select name="response_type" id='response_type'>
+        <option value="arrayBuffer">arrayBuffer</option>
+        <option value="blob">blob</option>
+        <option value="json" selected>json</option>
+        <option value="text">text</option>
+      </select>
+    </p>
+    <h2>Response</h2>
+    <div id="response"></div>
+    <script>
+      (function(window, document) {
+        var prepareOutput = function(body, type) {
+          if (type === 'json') {
+            var pre = document.createElement('pre');
+            pre.textContent = JSON.stringify(body, null, 2);
+            return pre;
+          }
+          if (type === 'blob' && ~body.type.indexOf('image')) {
+            var img = document.createElement('img');
+            img.src = URL.createObjectURL(body);
+            return img;
+          }
+          return document.createTextNode(body);
+        };
+        var input = document.querySelector('#url');
+        var button = document.querySelector('#fetch');
+        var bodyType = document.querySelector('#response_type');
+        var response = document.querySelector('#response');
+        var container = document.querySelector('#response');
+
+        button.addEventListener('click', function() {
+          while (container.lastChild) {
+            container.removeChild(container.lastChild);
+          }
+          fetch(input.value)
+          .then(function(res) {
+            return res[bodyType.value]();
+          })
+          .then(function(body) {
+            var output = prepareOutput(body, bodyType.value);
+            container.appendChild(output);
+          });
+        })
+      })(window, document);
+    </script>
+    <script src='prism.js' data-default-language="javascript"></script>
+  </body>
+</html>
